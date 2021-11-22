@@ -1,7 +1,8 @@
 const express = require('express');
+const sequelize = require('./config/connection');
 const mysql = require('mysql2');
 const inquirer = require('inquirer');
-const sequelize = require('./config/connection');
+
 
 const PORT = process.env.PORT || 3001;
 const app = express();
@@ -16,12 +17,18 @@ function questions() {
                 type: "list",
                 name: "options",
                 message: "What would you like to do?",
-                choices: ["View All Departments", "View All Roles", "View All Employees", "Add a Deparment", "Add an Employee", "Update an Employee"]
+                choices: ["View All Departments",
+                    "View All Roles",
+                    "View All Employees",
+                    "Add a Deparment",
+                    "Add an Employee",
+                    "Update an Employee"]
             }
         ])
-    }
+        .then
+}
 
 
-    sequelize.sync().then(() => {
-        app.listen(PORT, () => console.log('Now listening'));
-      });
+sequelize.sync().then(() => {
+    app.listen(PORT, () => console.log('Now listening'));
+});
