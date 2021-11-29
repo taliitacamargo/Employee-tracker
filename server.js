@@ -1,14 +1,31 @@
 const express = require('express');
-const sequelize = require('./config/connection');
+// const sequelize = require('./config/connection');
 const mysql = require('mysql2');
 const inquirer = require('inquirer');
-
 
 const PORT = process.env.PORT || 3001;
 const app = express();
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
+
+
+const db = mysql.createConnection (
+    {
+    host: 'localhost',
+    user: 'root',
+    password: 'rootroot',
+    database: 'employee_db'
+    },
+    console.log(`connected to employee_db database.`)
+);
+
+init();
+
+function init () {
+    console.log(`starting employee_tracker`);
+    questions();
+}
 
 function questions() {
     inquirer
@@ -62,22 +79,29 @@ function questions() {
 
 function viewAllDeparments() {
     const allDept = `SELECT id, department_name FROM deparment`;
-    sequelize.query(allDept, (err, res) => {
-        if (err) {
-            res.status(500).json({ error: err.message });
-            return;
-        }
-        res.json({
-            message: 'sucess',
-            data: res
-        });
-        questions();
-    });
-};
+    db.promise().query(allDept, 
+       
+        // if (err) {
+        //     res.status(500).json({ error: err.message });
+        //     return;
+        // }
+)
+    .then(([rows]) => {
+        let depts = rows;
+        console.table(depts);
+    })
+
+        // res.json({
+        //     message: 'sucess',
+        //     data: res
+        // })
+        .then(() => 
+            questions()) 
+    };
 
 function viewAllRoles() {
     const allRoles = `SELECT id, title FROM role`;
-    sequelize.query(allRoles, (err, res) => {
+    db.query(allRoles, (err, res) => {
         if (err) {
             res.status(500).json({ error: err.message });
             return;
@@ -95,7 +119,7 @@ function viewAllEmployees() {
     role.salary, department.deparment_name, manager_id 
     from employeeLEFT JOIN role ON employee.role_id
      = role.id LEFT JOIN department ON department.id = role.department_id;`;
-    sequelize.query(employeesList, (err, res) => {
+    db.query(employeesList, (err, res) => {
         if (err) {
             res.status(500).json({ error: err.message });
             return;
@@ -119,7 +143,7 @@ function addDepartment() {
         ])
         .then((response) => {
             const newDept = `INSERT INTO department SET? `;
-            sequelize.query(newDept, {
+            db.query(newDept, {
                 department_name: response.department_name
             }, (err, res) => {
                 if (err) {
@@ -156,7 +180,7 @@ function addRole() {
         ])
         .then((response) => {
             const newRole = `INSERT INTO role SET ?`;
-            sequelize.query(newRole, {
+            db.query(newRole, {
                 department_id: response.department_id,
                 title: response.title,
                 salary: response.salary
@@ -200,7 +224,7 @@ function addEmployee() {
         ])
         .then((response) => {
             const newEmployee = `INSERT INTO employee SET ?`;
-            sequelize.query(newEmployee, {
+            db.query(newEmployee, {
                 first_name: response.first_name,
                 last_name: response.last_name,
                 role_id: response.role_id,
@@ -221,7 +245,7 @@ function addEmployee() {
 
 function updateEmployee() {
     const updateRole = `SELECT * FROM employee`;
-    sequelize.query(updateRole, (err,res) => {
+    db.query(updateRole, (err,res) => {
         if (err) {
             res.status(500).json({ error: err.message });
             return;
@@ -238,11 +262,7 @@ function updateEmployee() {
 
 }
 
-
-
-
-
-sequelize.sync().then(() => {
-    app.listen(PORT, () => console.log('Now listening'));
+    app.listen(PORT, () => {
+        console.log(`Server running on port ${PORT}`);
     
 });
