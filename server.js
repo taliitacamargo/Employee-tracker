@@ -10,19 +10,19 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
 
-const db = mysql.createConnection (
+const db = mysql.createConnection(
     {
-    host: 'localhost',
-    user: 'root',
-    password: 'rootroot',
-    database: 'employee_db'
+        host: 'localhost',
+        user: 'root',
+        password: 'rootroot',
+        database: 'employee_db'
     },
     console.log(`connected to employee_db database.`)
 );
 
 init();
 
-function init () {
+function init() {
     console.log(`starting employee_tracker`);
     questions();
 }
@@ -79,25 +79,23 @@ function questions() {
 
 function viewAllDeparments() {
     const allDept = `SELECT id, department_name FROM deparment`;
-    db.promise().query(allDept, 
-       
+    db.promise().query(allDept
         // if (err) {
         //     res.status(500).json({ error: err.message });
         //     return;
         // }
-)
-    .then(([rows]) => {
-        let depts = rows;
-        console.table(depts);
-    })
-
+    )
+        .then(([rows]) => {
+            let depts = rows;
+            console.table(depts);
+        })
         // res.json({
         //     message: 'sucess',
         //     data: res
         // })
-        .then(() => 
-            questions()) 
-    };
+        .then(() =>
+            questions())
+};
 
 function viewAllRoles() {
     const allRoles = `SELECT id, title FROM role`;
@@ -245,24 +243,24 @@ function addEmployee() {
 
 function updateEmployee() {
     const updateRole = `SELECT * FROM employee`;
-    db.query(updateRole, (err,res) => {
+    db.query(updateRole, (err, res) => {
         if (err) {
             res.status(500).json({ error: err.message });
             return;
         }
         inquirer
-        .prompt ([
-            {
-               type: "list",
-               name:  "first_name",
-               choices: []
-            },
-        ])
+            .prompt([
+                {
+                    type: "list",
+                    name: "first_name",
+                    choices: []
+                },
+            ])
     })
 
 }
 
-    app.listen(PORT, () => {
-        console.log(`Server running on port ${PORT}`);
-    
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+
 });
