@@ -8,6 +8,7 @@
     "inquirer": "^8.2.0",
     "mysql": "^2.18.1",
     "mysql2": "^2.3.3",
+    "seed": "^0.4.4",
     "sequelize": "^6.12.0-alpha.1"
   }
 }

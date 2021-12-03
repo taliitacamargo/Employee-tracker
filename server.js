@@ -78,7 +78,7 @@ function questions() {
 }
 
 function viewAllDeparments() {
-    const allDept = `SELECT id, department_name FROM deparment`;
+    const allDept = `SELECT id, department_name FROM department`;
     db.promise().query(allDept
         // if (err) {
         //     res.status(500).json({ error: err.message });
