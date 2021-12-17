@@ -1,4 +1,8 @@
 {
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "seed": "node ./db/seeds.sql"
+  },
   "dependencies": {
     "2": "^3.0.0",
     "console.table": "^0.10.0",

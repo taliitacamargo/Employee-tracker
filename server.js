@@ -2,7 +2,7 @@ const express = require('express');
 // const sequelize = require('./config/connection');
 const mysql = require('mysql2');
 const inquirer = require('inquirer');
-
+require("console.table");
 const PORT = process.env.PORT || 3001;
 const app = express();
 
@@ -17,6 +17,7 @@ const db = mysql.createConnection(
         password: 'rootroot',
         database: 'employee_db'
     },
+    
     console.log(`connected to employee_db database.`)
 );
 
@@ -78,13 +79,13 @@ function questions() {
 }
 
 function viewAllDeparments() {
-    const allDept = `SELECT id, department_name FROM department`;
-    db.promise().query(allDept
-        // if (err) {
-        //     res.status(500).json({ error: err.message });
-        //     return;
-        // }
-    )
+    const allDept = `SELECT deparment.id AS id, department_name AS department FROM deparment;`;
+    db.query(allDept, (err,rows) => {
+        if (err) {
+            res.status(500).json({ error: err.message });
+            return;
+        }
+    })
         .then(([rows]) => {
             let depts = rows;
             console.table(depts);
@@ -98,36 +99,29 @@ function viewAllDeparments() {
 };
 
 function viewAllRoles() {
-    const allRoles = `SELECT id, title FROM role`;
+    const allRoles = `SELECT id, title FROM employee_role`;
     db.query(allRoles, (err, res) => {
         if (err) {
-            res.status(500).json({ error: err.message });
             return;
         }
-        res.json({
-            message: 'sucess',
-            data: res
-        });
+        console.table(res);
         questions();
     });
 };
 
 function viewAllEmployees() {
-    const employeesList = `SELECT employee.id, first_name, last_name, role.title,
-    role.salary, department.deparment_name, manager_id 
-    from employeeLEFT JOIN role ON employee.role_id
+    const employeesList = `SELECT employee.id, employee.first_name, employee.last_name, role.title,
+    role.salary, department.name AS department, manager_id 
+    from employee LEFT JOIN role ON employee.role_id
      = role.id LEFT JOIN department ON department.id = role.department_id;`;
     db.query(employeesList, (err, res) => {
         if (err) {
-            res.status(500).json({ error: err.message });
+         console.log(err);
             return;
-        }
-        res.json({
-            message: 'sucess',
-            data: res
-        });
+         }
+         console.table(res);
+        })
         questions();
-    });
 };
 
 function addDepartment() {
@@ -145,13 +139,10 @@ function addDepartment() {
                 department_name: response.department_name
             }, (err, res) => {
                 if (err) {
-                    res.status(500).json({ error: err.message });
+                  console.log(err);
                     return;
                 }
-                res.json({
-                    message: 'sucess',
-                    data: res
-                });
+                console.table(res)
                 questions();
             });
         });
