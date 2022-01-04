@@ -121,6 +121,7 @@ function viewAllEmployees() {
         }
         console.log("\n")
         console.table(res);
+
     })
     questions();
 };
@@ -235,37 +236,91 @@ function addEmployee() {
 
 
 function updateEmployee() {
-    const updateRole = `SELECT * FROM employee`;
-    db.query(updateRole, (err, res) => {
-        console.log(res);
+    const selectEmployee = `SELECT employee.id, employee.first_name, employee.last_name FROM employee;`;
+    db.query(selectEmployee, (err, res) => {
+        const employees = res.map(({ id, first_name, last_name }) => {
+            return {
+                name:
+                    `${first_name} ${last_name}`,
+                value: id
+            }
+        })
 
-        const employees = res.map(({id,first_name,last_name}) => {
-            return {name: `${first_name} ${last_name}`, value: id}
+        const selectRole = `SELECT id, title  FROM employee_role;`;
+        db.query(selectRole, (err, res) => {
+            const all = res.map(({ id, title }) => {
+                return {
+                    name:
+                        `${title}`,
+                    value: id
+                }
+            })
+
+            // console.log(res); 
+            inquirer
+                .prompt([
+                    {
+                        type: "list",
+                        name: "select_employee",
+                        choices: employees
+                    },
+                    {
+                        type: "list",
+                        name: "new_Role",
+                        choices: all
+                    },
+                ])
+                .then((response) => {
+                    const updateRole = `UPDATE employee SET role_id = ? WHERE id = ?;`;
+                    db.query(updateRole, {
+                        id: response.select_employee,
+                        role: response.new_Role
+                    }, (err, res) => {
+
+                        if (err) {
+                            console.log(err)
+                            return;
+                        }
+                        console.log(`Updated employee's role`);
+                    });
+                    questions();
+                });
         });
-        if (err) {
-          console.log(err)
-            return;
-        }
-        inquirer
-            .prompt([
-                {
-                    type: "list",
-                    name: "first_name",
-                    choices: employees
-                },
-            ])
-// WHEN I choose to update an employee role
-// THEN I am prompted to select an employee to update 
-// and their new role and this information is updated in the database 
-
-            .then((response) => {
-                const updateEmployeeRole = `SELECT * FROM employee_role`;
-                db.query(updateEmployeeRole, (err,res) => {
-                    return {
-                        name: `${}`
-                    }
-                })
-            });
     })
-
 }
+// WHEN I choose to update an employee role
+            // THEN I am prompted to select an employee to update 
+            // and their new role and this information is updated in the database 
+
+            // .then((response) => {
+            //     const updateEmployeeRole = `SELECT * FROM employee_role`;
+            //     db.query(updateEmployeeRole, (err, res) => {
+            //         inquirer
+            //             .prompt([
+            //                 {
+            //                     type: "list",
+            //                     name: "updatingEmployee",
+            //                     choices: employees
+            //                 },
+            //                 {
+            //                     type: "list",
+            //                     name: "newRole",
+            //                     choices: employeeRoles
+            //                 },
+            //             ])
+            //             .then((response) => {
+
+            //                 const updateEmployee = `UPDATE employee SET employee.role =? WHERE id=?`;
+
+
+            //                 db.query(updateEmployee, {
+            //                     role_id: response.role_id
+            //                 }, (err, res) => {
+
+                            // });
+                    // console.log(res);
+                    // const employeRoles = res.map(({ id, title }) => {
+                    //     return {
+                    //         name: `${title}`,
+                    //         value: id
+                    //     };
