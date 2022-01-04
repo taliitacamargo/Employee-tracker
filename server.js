@@ -272,10 +272,10 @@ function updateEmployee() {
                 ])
                 .then((response) => {
                     const updateRole = `UPDATE employee SET role_id = ? WHERE id = ?;`;
-                    db.query(updateRole, {
-                        id: response.select_employee,
-                        role: response.new_Role
-                    }, (err, res) => {
+                    db.query(updateRole, [
+                        response.new_Role,
+                        response.select_employee,
+                    ], (err, res) => {
 
                         if (err) {
                             console.log(err)
